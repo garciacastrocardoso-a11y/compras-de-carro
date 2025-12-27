@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="pt">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Garcia Cardoso Motors — Vendas de Carros</title>
+  <style>
+    :root{--bg:#f4f6fb;--card:#fff;--accent:#0b63ff;--muted:#6b7280}
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial}
+    body{margin:0;background:linear-gradient(180deg,#eef2ff 0%,var(--bg) 100%);color:#111}
+    .container{max-width:1100px;margin:18px auto;padding:18px}
+    .logo{display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:12px}
+    .logo h1{margin:0;font-size:20px;color:var(--accent)}
+    .slogan{font-size:13px;color:var(--muted);text-align:center;margin-bottom:8px}
+    .card{background:var(--card);border-radius:12px;padding:14px;box-shadow:0 6px 18px rgba(11,99,255,0.06)}
+    .login-screen{max-width:480px;margin:12px auto;padding:0;border-radius:12px;overflow:hidden}
+    .login-hero{height:200px;background:#111;color:#fff;display:flex;align-items:center;justify-content:center;position:relative}
+    .login-hero img{width:100%;height:100%;object-fit:cover;filter:brightness(0.6)}
+    .login-box{position:relative;padding:18px}
+    label{display:block;font-size:14px;color:#333;margin:6px 0}
+    input[type=text],input[type=number],input[type=tel]{width:100%;padding:10px;border-radius:8px;border:1px solid #e6e9ef;font-size:15px}
+    .btn{display:inline-block;padding:10px 14px;border-radius:10px;background:var(--accent);color:#fff;border:none;cursor:pointer;font-weight:600}
+    .muted{color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px}
+    .car-card{padding:12px;border-radius:10px;border:1px solid #eef2ff;background:linear-gradient(180deg,#fff,#fbfdff);display:flex;flex-direction:column}
+    .car-img{width:100%;height:160px;border-radius:8px;object-fit:cover;margin-bottom:8px;background:#f7f9ff}
+    .car-title{font-weight:700;margin:0 0 6px 0}
+    .car-meta{font-size:13px;color:var(--muted);margin-bottom:8px}
+    .actions{display:flex;gap:8px;margin-top:auto}
+    .fav-btn{background:transparent;border:1px solid #e6e9ef;padding:8px 10px;border-radius:8px;cursor:pointer}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;z-index:50}
+    .modal{width:92%;max-width:720px;background:#fff;border-radius:12px;padding:16px;max-height:90vh;overflow:auto}
+    .row{display:flex;gap:8px}
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+    .top-actions{display:flex;gap:8px;align-items:center}
+    @media (max-width:520px){.logo{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <h1>🚗 Garcia Cardoso Motors</h1>
+    </div>
+    <div class="slogan">Luxo, Potência e Confiança ao Seu Alcance</div>
+
+    <!-- LOGIN -->
+    <div id="login" class="login-screen card">
+      <div class="login-hero">
+        <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1600' height='600'><rect width='100%' height='100%' fill='%23ff2d2d'/><text x='50%' y='50%' font-size='48' text-anchor='middle' fill='white' font-family='Arial' dy='.3em'>Limousine Vermelha</text></svg>" alt="Limousine vermelha">
+      </div>
+      <div class="login-box">
+        <h2>Entrar</h2>
+        <p class="muted">Digite o seu nome e valor disponível (Kz) — sem senha.</p>
+        <label for="nome">Nome</label>
+        <input id="nome" type="text" placeholder="Seu nome" />
+        <label for="valor">Valor disponível (Kz)</label>
+        <input id="valor" type="number" placeholder="Ex: 5000000" min="0" />
+        <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+          <button id="entrarBtn" class="btn">Entrar</button>
+          <button id="exemploBtn" class="btn" style="background:#10b981">Exemplo rápido</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- APP -->
+    <div id="app" style="display:none">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+          <div>
+            <div id="fixedWelcome" style="padding:8px 12px;border-radius:10px;background:#fffef6;border:1px solid #fff1c2;color:#6a4b00"><strong>Bem vindo ao site de vendas de carros do Garcia Cardoso</strong></div>
+            <div id="userGreeting" class="muted" style="margin-top:8px"></div>
+          </div>
+
+          <div class="top-actions">
+            <div style="min-width:220px">
+              <div class="muted">Filtrar por</div>
+              <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+                <select id="filterFuel"><option value="all">Combustível: Todos</option><option value="Gasolina">Gasolina</option><option value="Gasóleo">Gasóleo</option></select>
+                <select id="filterTrans"><option value="all">Transmissão: Todas</option><option value="Automático">Automático</option><option value="Manual">Manual</option></select>
+              </div>
+            </div>
+            <button id="viewPurchasesBtn" class="fav-btn">Ver compras anteriores</button>
+            <button id="logoutBtn" class="btn" style="background:#ef4444">Sair</button>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+          <div class="muted">Orçamento:</div>
+          <div id="budgetDisplay" style="font-weight:700"></div>
+        </div>
+
+        <div id="results" class="grid"></div>
+        <div id="noResults" style="display:none;margin-top:12px;color:#7a7a7a">Nenhum carro encontrado dentro do seu valor/ filtros.</div>
+      </div>
+
+      <footer>
+        <div>Exemplo de site de vendas — dados fictícios. Favoritos e compras guardados localmente.</div>
+      </footer>
+    </div>
+  </div>
+
+  <div id="modalRoot" style="display:none"></div>
+
+  <script>
+    // Cars with individual SVG data images (offline-friendly)
+    const cars = [
+      {id:1,make:'Toyota',model:'Corolla',year:2018,price:3500000,location:'Luanda',transmission:'Automático',fuel:'Gasolina', image: svgData('Toyota Corolla','#e6f7ff','#0b63ff')},
+      {id:2,make:'Hyundai',model:'i10',year:2016,price:1800000,location:'Benguela',transmission:'Manual',fuel:'Gasolina', image: svgData('Hyundai i10','#fff6e6','#ff8a00')},
+      {id:3,make:'Mercedes',model:'C200',year:2015,price:9500000,location:'Luanda',transmission:'Automático',fuel:'Gasóleo', image: svgData('Mercedes C200','#f0f7e6','#0b8f3a')},
+      {id:4,make:'Mazda',model:'CX-5',year:2019,price:7200000,location:'Huíla',transmission:'Automático',fuel:'Gasolina', image: svgData('Mazda CX-5','#fff0f6','#ff2d7a')},
+      {id:5,make:'Renault',model:'Kwid',year:2020,price:2400000,location:'Uíge',transmission:'Manual',fuel:'Gasolina', image: svgData('Renault Kwid','#f3f6ff','#1f52a0')},
+      {id:6,make:'Ford',model:'Ranger',year:2017,price:6500000,location:'Benguela',transmission:'Manual',fuel:'Gasóleo', image: svgData('Ford Ranger','#fff7e6','#b35900')},
+      {id:7,make:'Audi',model:'A4',year:2014,price:8500000,location:'Luanda',transmission:'Automático',fuel:'Gasolina', image: svgData('Audi A4','#eef6ff','#002b6e')},
+      {id:8,make:'Volkswagen',model:'Polo',year:2021,price:4300000,location:'Cunene',transmission:'Manual',fuel:'Gasolina', image: svgData('VW Polo','#f0fff4','#006644')}
+    ];
+
+    function svgData(title,bg,txt){
+      const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='450'><rect width='100%' height='100%' fill='${bg}' rx='12' ry='12'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='36' fill='${txt}'>${title}</text></svg>`;
+      return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    }
+
+    // DOM elements
+    const loginEl = document.getElementById('login');
+    const appEl = document.getElementById('app');
+    const entrarBtn = document.getElementById('entrarBtn');
+    const exemploBtn = document.getElementById('exemploBtn');
+    const nomeInput = document.getElementById('nome');
+    const valorInput = document.getElementById('valor');
+    const userGreeting = document.getElementById('userGreeting');
+    const budgetDisplay = document.getElementById('budgetDisplay');
+    const resultsEl = document.getElementById('results');
+    const noResultsEl = document.getElementById('noResults');
+    const filterFuel = document.getElementById('filterFuel');
+    const filterTrans = document.getElementById('filterTrans');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const modalRoot = document.getElementById('modalRoot');
+    const viewPurchasesBtn = document.getElementById('viewPurchasesBtn');
+
+    let user = {name:'',budget:0};
+
+    function formatNumber(n){ return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
+    // favorites saved in localStorage
+    function loadFavs(){ try{ return JSON.parse(localStorage.getItem('car_favs')||'[]') }catch(e){return []} }
+    function saveFavs(arr){ localStorage.setItem('car_favs', JSON.stringify(arr)); }
+    function isFav(id){ return loadFavs().indexOf(id)!==-1 }
+
+    // purchases saved in localStorage
+    function loadPurchases(){ try{ return JSON.parse(localStorage.getItem('purchases')||'[]') }catch(e){return []} }
+    function savePurchase(p){ const arr = loadPurchases(); arr.push(p); localStorage.setItem('purchases', JSON.stringify(arr)); }
+
+    // render car cards
+    function renderCars(){
+      const fuel = filterFuel.value; const trans = filterTrans.value;
+      const filtered = cars.filter(c=>c.price<=user.budget).filter(c=>fuel==='all'?true:c.fuel===fuel).filter(c=>trans==='all'?true:c.transmission===trans);
+      resultsEl.innerHTML='';
+      if(filtered.length===0){ noResultsEl.style.display='block'; return } else noResultsEl.style.display='none';
+      filtered.forEach(c=>{
+        const el = document.createElement('div'); el.className='car-card';
+        el.innerHTML = `
+          <img src="${c.image}" class="car-img" alt="${c.make} ${c.model}" />
+          <div class="car-title">${c.make} ${c.model} — ${c.year}</div>
+          <div class="car-meta">${c.location} • ${c.transmission} • ${c.fuel}</div>
+          <div style="font-weight:800;font-size:18px;margin-top:6px">Kz ${formatNumber(c.price)}</div>
+          <div class="actions">
+            <button class="btn" data-buy="${c.id}">Comprar</button>
+            <button class="fav-btn" data-fav="${c.id}">${isFav(c.id)?'Remover favorito':'Favorito'}</button>
+            <button class="fav-btn" data-details="${c.id}">Detalhes</button>
+          </div>
+        `;
+        resultsEl.appendChild(el);
+      });
+      // handlers
+      document.querySelectorAll('[data-fav]').forEach(b=>b.addEventListener('click', e=>{
+        const id = Number(b.getAttribute('data-fav'));
+        toggleFav(id);
+        // after adding to favorites, navigate to purchase screen for that car
+        if(isFav(id)) openPurchaseModal(id);
+      }));
+      document.querySelectorAll('[data-buy]').forEach(b=>b.addEventListener('click', e=> openPurchaseModal(Number(b.getAttribute('data-buy')))));
+      document.querySelectorAll('[data-details]').forEach(b=>b.addEventListener('click', e=> openDetailsModal(Number(b.getAttribute('data-details')))));
+    }
+
+    function toggleFav(id){
+      const favs = loadFavs(); const idx = favs.indexOf(id);
+      if(idx===-1) favs.push(id); else favs.splice(idx,1);
+      saveFavs(favs);
+      renderCars();
+    }
+
+    // login
+    function doLogin_real(){
+      const name = nomeInput.value.trim(); const budget = Number(valorInput.value)||0;
+      if(!name){ alert('Por favor, insira o seu nome.'); nomeInput.focus(); return }
+      if(budget<=0){ if(!confirm('Orçamento vazio ou inválido. Deseja continuar com orçamento 0?')) return }
+      user.name = name; user.budget = budget;
+      loginEl.style.display='none'; appEl.style.display='block'; userGreeting.textContent = `Olá ${user.name}!`; budgetDisplay.textContent = `Kz ${formatNumber(user.budget)}`;
+      renderCars();
+    }
+    entrarBtn.addEventListener('click', doLogin_real);
+    exemploBtn.addEventListener('click', ()=>{ nomeInput.value='Garcia Cardoso'; valorInput.value='5000000'; });
+    filterFuel.addEventListener('change', renderCars);
+    filterTrans.addEventListener('change', renderCars);
+    logoutBtn.addEventListener('click', ()=>{ if(!confirm('Deseja realmente sair?')) return; nomeInput.value=''; valorInput.value=''; loginEl.style.display='block'; appEl.style.display='none'; });
+
+    // modal helpers
+    function closeModal(){ modalRoot.innerHTML=''; modalRoot.style.display='none'; }
+    function openModal(html){ modalRoot.innerHTML = `<div class="modal-backdrop" onclick="(event=>{ if(event.target.classList.contains('modal-backdrop')) closeModal(); })(event)">${html}</div>`; modalRoot.style.display='block'; }
+
+    function openDetailsModal(id){
+      const c = cars.find(x=>x.id===id);
+      const html = `<div class="modal"><h3>Detalhes — ${c.make} ${c.model}</h3><img src='${c.image}' style='width:100%;height:200px;object-fit:cover;border-radius:8px;margin-bottom:8px'/><p class='muted'>Local: ${c.location}</p><p class='muted'>Transmissão: ${c.transmission} • Combustível: ${c.fuel}</p><p style='font-weight:800'>Preço: Kz ${formatNumber(c.price)}</p><div style='display:flex;gap:8px;margin-top:10px'><button class='btn' onclick='(event=>{closeModal();openPurchaseModal(${c.id});})(event)'>Comprar</button><button class='fav-btn' onclick='(event=>{toggleFav(${c.id});closeModal();})(event)'>${isFav(c.id)?'Remover favorito':'Favorito'}</button><button class='fav-btn' onclick='closeModal()'>Fechar</button></div></div>`;
+      openModal(html);
+    }
+
+    function openPurchaseModal(id){
+      const c = cars.find(x=>x.id===id);
+      const html = `<div class="modal"><h3>Comprar — ${c.make} ${c.model}</h3>
+        <p class='muted'>Local de compra: <strong>${c.location}</strong></p>
+        <p class='muted'>Preço a pagar: <strong>Kz ${formatNumber(c.price)}</strong></p>
+        <p class='muted'>Pagamento por cartão digital (simulado). Introduza os dados do cartão.</p>
+        <div style='margin-top:8px'>
+          <label>Nome no cartão</label>
+          <input id='card_name' type='text' placeholder='Nome tal como no cartão' />
+          <div class='row' style='margin-top:8px'>
+            <div style='flex:2'>
+              <label>Número do cartão</label>
+              <input id='card_number' type='tel' placeholder='1234 5678 9012 3456' />
+            </div>
+            <div style='flex:1'>
+              <label>MM/AA</label>
+              <input id='card_exp' type='text' placeholder='04/26' />
+            </div>
+            <div style='flex:1'>
+              <label>CVV</label>
+              <input id='card_cvv' type='tel' placeholder='123' />
+            </div>
+          </div>
+          <div style='margin-top:10px;display:flex;gap:8px'>
+            <button class='btn' id='payBtn'>Pagar Kz ${formatNumber(c.price)}</button>
+            <button class='fav-btn' onclick='closeModal()'>Cancelar</button>
+          </div>
+        </div>
+      </div>`;
+      openModal(html);
+      // attach handler after modal opened
+      setTimeout(()=>{
+        const payBtn = document.getElementById('payBtn');
+        payBtn.addEventListener('click', ()=>{
+          const name = document.getElementById('card_name').value.trim();
+          const num = document.getElementById('card_number').value.replace(/\s+/g,'');
+          const exp = document.getElementById('card_exp').value.trim();
+          const cvv = document.getElementById('card_cvv').value.trim();
+          if(!name||num.length<12||!exp||cvv.length<3){ alert('Por favor preencha corretamente os dados do cartão (simulado).'); return }
+          payBtn.disabled = true; payBtn.textContent = 'Processando...';
+          setTimeout(()=>{
+            payBtn.disabled = false; payBtn.textContent = `Pagar Kz ${formatNumber(c.price)}`;
+            const tx = 'TX'+Date.now();
+            const receipt = generateReceipt(user.name,c,tx);
+            // save purchase locally
+            const purchaseObj = {tx,user:user.name,car:c,date:new Date().toISOString(),receipt};
+            savePurchase(purchaseObj);
+            // download receipt as text
+            downloadReceipt(receipt,`comprovativo_${c.make}_${c.model}_${tx}.txt`);
+            alert('Pagamento simulado com sucesso. Comprovativo será descarregado. Também podes ver as compras anteriores no botão "Ver compras anteriores".');
+            closeModal();
+          },1200);
+        });
+      },100);
+    }
+
+    function generateReceipt(buyer,car,tx){
+      const date = new Date().toLocaleString();
+      return `Comprovativo de Compra\n====================\nTransação: ${tx}\nData: ${date}\nComprador: ${buyer}\nCarro: ${car.make} ${car.model} (${car.year})\nLocal: ${car.location}\nTransmissão: ${car.transmission}\nCombustível: ${car.fuel}\nValor: Kz ${formatNumber(car.price)}\n\nObrigado por usar o site de vendas de carros do Garcia Cardoso.`;
+    }
+
+    function downloadReceipt(text,filename){
+      const blob = new Blob([text],{type:'text/plain;charset=utf-8'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    // View purchases modal: list saved purchases with options to download TXT or open printable view
+    function openPurchasesModal(){
+      const purchases = loadPurchases().reverse(); // newest first
+      let html = `<div class="modal"><h3>Compras anteriores (${purchases.length})</h3>`;
+      if(purchases.length===0){
+        html += `<p class="muted">Nenhuma compra encontrada.</p><div style="margin-top:12px"><button class="fav-btn" onclick="closeModal()">Fechar</button></div></div>`;
+        openModal(html); return;
+      }
+      html += `<div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">`;
+      purchases.forEach((p,idx)=>{
+        html += `<div style="padding:10px;border-radius:8px;border:1px solid #eee"><strong>${p.car.make} ${p.car.model}</strong> — ${new Date(p.date).toLocaleString()}<br>Transação: ${p.tx}<br>Valor: Kz ${formatNumber(p.car.price)}<div style="margin-top:8px;display:flex;gap:8px"><button class="btn" onclick='downloadSavedReceipt(${idx})'>Descarregar (.txt)</button><button class="fav-btn" onclick='openPrintable(${idx})'>Abrir/Imprimir</button></div></div>`;
+      });
+      html += `</div><div style="margin-top:12px"><button class="fav-btn" onclick="clearPurchases()">Limpar histórico</button> <button class="fav-btn" onclick="closeModal()">Fechar</button></div></div>`;
+      openModal(html);
+    }
+
+    // Download saved receipt (.txt) by index (index relative to reversed array)
+    function downloadSavedReceipt(revIdx){
+      const purchases = loadPurchases().reverse();
+      const p = purchases[revIdx];
+      if(!p) return alert('Recibo não encontrado.');
+      downloadReceipt(p.receipt,`comprovativo_${p.car.make}_${p.car.model}_${p.tx}.txt`);
+    }
+
+    // Open printable HTML receipt in new window (user can Save as PDF)
+    function openPrintable(revIdx){
+      const purchases = loadPurchases().reverse();
+      const p = purchases[revIdx];
+      if(!p) return alert('Recibo não encontrado.');
+      const html = `<!doctype html><html><head><meta charset="utf-8"><title>Comprovativo ${p.tx}</title><style>body{font-family:Arial;padding:20px} h1{color:#0b63ff} pre{white-space:pre-wrap}</style></head><body><h1>Comprovativo de Compra</h1><pre>${p.receipt}</pre><div style="margin-top:20px"><button onclick="window.print()">Imprimir / Guardar PDF</button></div></body></html>`;
+      const w = window.open('','_blank');
+      w.document.write(html);
+      w.document.close();
+    }
+
+    function clearPurchases(){
+      if(!confirm('Eliminar todo o histórico de compras?')) return;
+      localStorage.removeItem('purchases');
+      alert('Histórico removido.');
+      closeModal();
+    }
+
+    // Expose helper functions for inline modal buttons
+    window.closeModal = closeModal;
+    window.toggleFav = toggleFav;
+    window.downloadSavedReceipt = downloadSavedReceipt;
+    window.openPrintable = openPrintable;
+    window.clearPurchases = clearPurchases;
+
+    // Init bindings
+    viewPurchasesBtn.addEventListener('click', openPurchasesModal);
+
+    // enter key login
+    [nomeInput,valorInput].forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin_real(); }));
+
+  </script>
+</body>
+</html>
